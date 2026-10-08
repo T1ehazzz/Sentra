@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>СЕРГЕК — Driver Safety Telemetry</title>
+  <style>
+    /* Переменные для Тёмной темы */
+    :root {
+      --bg-dark: #0f1215;
+      --bg-gradient-1: rgba(0, 255, 157, 0.05);
+      --bg-gradient-2: rgba(255, 59, 48, 0.05);
+      --glass-bg: rgba(30, 34, 40, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f0f3f6;
+      --text-muted: #8b949e;
+      --accent-safe: #00ff9d;
+      --accent-danger: #ff3b30;
+      --ash-gray: #a3b1c6;
+      --icon-bg: rgba(255, 255, 255, 0.04);
+      --box-inner-bg: rgba(0, 0, 0, 0.25);
+      --modal-bg: rgba(20, 24, 30, 0.95);
+    }
+
+    /* Переменные для Светлой темы */
+    [data-theme="light"] {
+      --bg-dark: #eef2f6;
+      --bg-gradient-1: rgba(0, 200, 120, 0.08);
+      --bg-gradient-2: rgba(255, 59, 48, 0.08);
+      --glass-bg: rgba(255, 255, 255, 0.75);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --text-main: #1a202c;
+      --text-muted: #64748b;
+      --accent-safe: #059669;
+      --accent-danger: #dc2626;
+      --ash-gray: #475569;
+      --icon-bg: rgba(0, 0, 0, 0.04);
+      --box-inner-bg: rgba(235, 240, 245, 0.8);
+      --modal-bg: rgba(255, 255, 255, 0.95);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, var(--bg-gradient-1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, var(--bg-gradient-2) 0%, transparent 40%);
+      color: var(--text-main);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Glassmorphism Panel */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Navigation */
+    header {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-action, .lang-select, .form-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-main);
+      background: var(--icon-bg);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .btn-action:hover, .lang-select:hover {
+      opacity: 0.8;
+      border-color: var(--accent-safe);
+    }
+
+    .lang-select option, .form-select option {
+      background: var(--bg-dark);
+      color: var(--text-main);
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--icon-bg);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-safe);
+      box-shadow: 0 0 8px var(--accent-safe);
+    }
+
+    /* Driver Profile Banner */
+    .profile-banner {
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--box-inner-bg);
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent-safe);
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .car-badge {
+      background: rgba(255,255,255,0.1);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid var(--glass-border);
+    }
+
+    /* Dashboard Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .profile-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    /* Hero Monitor Card */
+    .hero-card {
+      padding: 30px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-card.alert {
+      border-color: var(--accent-danger);
+      background: rgba(255, 59, 48, 0.15);
+      box-shadow: 0 0 30px rgba(255, 59, 48, 0.2);
+    }
+
+    .card-title-sub {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--ash-gray);
+      margin-bottom: 15px;
+    }
+
+    .face-box {
+      background: var(--box-inner-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px 40px;
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .status-svg {
+      color: var(--accent-safe);
+    }
+
+    .hero-card.alert .status-svg {
+      color: var(--accent-danger);
+    }
+
+    .status-headline {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 10px;
+      color: var(--accent-safe);
+    }
+
+    .hero-card.alert .status-headline {
+      color: var(--accent-danger);
+    }
+
+    /* Gauge Ring */
+    .widget-panel {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 15px 0;
+    }
+
+    .ring-container svg {
+      width: 120px;
+      height: 120px;
+      transform: rotate(-90deg);
+    }
+
+    .ring-container circle {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .ring-bg {
+      stroke: var(--icon-bg);
+    }
+
+    .ring-progress {
+      stroke: var(--accent-safe);
+      stroke-dasharray: 326;
+      stroke-dashoffset: 20;
+    }
+
+    .ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .icon-wrapper {
+      width: 44px;
+      height: 44px;
+      background: var(--icon-bg);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ash-gray);
+      border: 1px solid var(--glass-border);
+    }
+
+    .metric-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Chart */
+    .chart-panel {
+      padding: 20px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: var(--ash-gray);
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      padding-top: 10px;
+    }
+
+    .bar {
+      flex: 1;
+      background: var(--ash-gray);
+      opacity: 0.3;
+      border-radius: 4px;
+    }
+
+    /* Floating Actions: SOS & AI Support */
+    .floating-actions-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1500;
+    }
+
+    .btn-sos {
+      background: var(--accent-danger);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 59, 48, 0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .btn-sos:hover {
+      transform: scale(1.05);
+    }
+
+    .support-floating-btn {
+      background: var(--accent-safe);
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 255, 157, 0.3);
+    }
+
+    .chat-window {
+      position: fixed;
+      bottom: 140px;
+      right: 24px;
+      width: 350px;
+      height: 440px;
+      background: var(--modal-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      z-index: 1500;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 14px 18px;
+      background: var(--icon-bg);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .msg.ai {
+      background: var(--icon-bg);
+      border: 1px solid var(--glass-border);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .msg.user {
+      background: var(--accent-safe);
+      color: #000;
+      font-weight: 600;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    .faq-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--glass-border);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      border-color: var(--accent-safe);
+      color: var(--accent-safe);
+    }
+
+    .chat-footer {
+      padding: 10px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-footer input {
+      flex: 1;
+      background: var(--icon-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 10px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .chat-footer button {
+      background: var(--accent-safe);
+      color: #000;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Modal Overlay (Личный кабинет) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .modal-card {
+      background: var(--modal-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group select {
+      background: var(--icon-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--accent-safe);
+    }
+
+    .save-btn {
+      width: 100%;
+      background: var(--accent-safe);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .save-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="glass-panel">
+      <div class="logo-block">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-safe);">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span class="logo-title">СЕРГЕК / TELEMETRY</span>
+      </div>
+
+      <div class="header-actions">
+        <!-- Выбор языка -->
+        <select class="lang-select" id="lang-select" onchange="changeLanguage(this.value)">
+          <option value="kk">ҚАЗ</option>
+          <option value="ru">РУС</option>
+          <option value="en">ENG</option>
+        </select>
+
+        <!-- Кнопка темы -->
+        <button class="btn-action" id="theme-btn" onclick="toggleTheme()" title="Тема">
+          <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+
+        <!-- Кнопка Личный кабинет -->
+        <button class="btn-action" onclick="openModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span id="btn-profile-txt">Жеке кабинет</span>
+        </button>
+
+        <div class="connection-status">
+          <div class="dot" id="status-dot"></div>
+          <span id="conn-text">XIAO ESP32-S3 Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Profile Info Banner -->
+    <div class="glass-panel profile-banner">
+      <div class="profile-info">
+        <div class="profile-avatar" id="avatar-char">T</div>
+        <div>
+          <div style="font-weight: 700; font-size: 15px;" id="disp-driver-name">Тамерлан / Ералы</div>
+          <div style="font-size: 12px; color: var(--text-muted);" id="disp-car-model">Автомобиль: Toyota Camry (Седан)</div>
+        </div>
+      </div>
+      <div class="car-badge" id="disp-car-num">011 AAA 03</div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+      <!-- Live Status Hero -->
+      <div class="glass-panel hero-card" id="hero-card">
+        <div class="card-title-sub" id="lbl-hero-title">01 / ЖҮРГІЗУШІНІ БАҚЫЛАУ АЙМАҒЫ</div>
+
+        <div class="face-box">
+          <div id="face-icon" class="status-svg">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 10h20"/>
+              <path d="M3 10l1 7a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H4"/>
+              <path d="M21 10l-1 7a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h4"/>
+            </svg>
+          </div>
+          <div style="font-size: 11px; color: var(--ash-gray); letter-spacing: 1px;" id="lbl-sensor-title">AI КӨЗДІ БАҚЫЛАУ ДАТЧИГІ</div>
+        </div>
+
+        <div class="status-headline" id="status-text">СЕРГЕК / ҚАУІПСІЗ</div>
+      </div>
+
+      <!-- Safety Index Ring Widget -->
+      <div class="glass-panel widget-panel">
+        <div class="card-title-sub" id="lbl-safety-title">ҚАУІПСІЗДІК ИНДЕКСІ</div>
+        <div class="ring-container">
+          <svg>
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-progress" id="ring-bar" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="ring-text" id="score-val">96%</div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); text-align: center;" id="lbl-risk-level">Қауіп деңгейі: ТӨМЕН</div>
+      </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="glass-panel metric-card">
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label" id="lbl-timer">Көзді жұму ұзақтығы</span>
+          <span class="metric-value" id="timer">0.0 сек</span>
+        </div>
+      </div>
+
+      <div class="glass-panel metric-card">
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label" id="lbl-buzzer">Дыбыстық дабыл (Buzzer)</span>
+          <span class="metric-value" id="buzzer-val">85 dB</span>
+        </div>
+      </div>
+
+      <div class="glass-panel metric-card">
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label" id="lbl-speed">Жылдамдық / GPS</span>
+          <span class="metric-value" id="speed-val">62 км/ч</span>
+        </div>
+      </div>
+
+      <div class="glass-panel metric-card">
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label" id="lbl-blink">Жыпылықтау жиілігі</span>
+          <span class="metric-value" id="blink-val">14 рет/мин</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Chart Panel -->
+    <div class="glass-panel chart-panel">
+      <div class="chart-header">
+        <span id="lbl-chart-title">02 / ҰЙҚЫШЫЛДЫҚ ДЕҢГЕЙІНІҢ ДИАГРАММАСЫ (LIVE GRAF)</span>
+        <span style="color: var(--accent-safe);" id="lbl-chart-status">Белсенді</span>
+      </div>
+      <div class="bar-chart">
+        <div class="bar" style="height: 15%;"></div>
+        <div class="bar" style="height: 20%;"></div>
+        <div class="bar" style="height: 10%;"></div>
+        <div class="bar" style="height: 35%;"></div>
+        <div class="bar" style="height: 12%;"></div>
+        <div class="bar" style="height: 18%;"></div>
+        <div class="bar" style="height: 25%;"></div>
+        <div class="bar" style="height: 15%;"></div>
+        <div class="bar" style="height: 30%;"></div>
+        <div class="bar" style="height: 10%;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal window: Личный кабинет -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="lbl-modal-title">ЖЕКЕ КАБИНЕТ / ТІРКЕЛУ</span>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+
+      <form onsubmit="saveProfile(event)">
+        <div class="form-group">
+          <label id="lbl-input-driver">Жүргізушінің аты-жөні</label>
+          <input type="text" id="input-driver" placeholder="Тамерлан" required>
+        </div>
+
+        <div class="form-group">
+          <label id="lbl-input-type">Көлік түрі (Тип транспорта)</label>
+          <select id="input-type" class="form-select">
+            <option value="Седан">Седан</option>
+            <option value="Кроссовер / SUV">Кроссовер / SUV</option>
+            <option value="Хэтчбек">Хэтчбек</option>
+            <option value="Автобус">Автобус</option>
+            <option value="Грузовик / Тягач">Грузовик / Тягач</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label id="lbl-input-model">Автомобиль маркасы мен моделі</label>
+          <input type="text" id="input-model" placeholder="Toyota Camry" required>
+        </div>
+
+        <div class="form-group">
+          <label id="lbl-input-num">Көліктің мемлекеттік нөмірі</label>
+          <input type="text" id="input-num" placeholder="011 AAA 03" required>
+        </div>
+
+        <button type="submit" class="save-btn" id="lbl-btn-save">САҚТАУ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating SOS & Support Buttons -->
+  <div class="floating-actions-container">
+    <button class="btn-sos" onclick="triggerSOS()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>SOS</span>
+    </button>
+    <button class="support-floating-btn" onclick="toggleChat()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span id="lbl-support-btn">AI Қолдау</span>
+    </button>
+  </div>
+
+  <!-- Chat Window -->
+  <div class="chat-window" id="chat-window">
+    <div class="chat-header">
+      <span id="lbl-chat-title">🤖 СЕРГЕК AI ҚОЛДАУ</span>
+      <button class="close-btn" onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg ai" id="lbl-ai-welcome">
+        Сәлеметсіз бе! Мен СЕРГЕК ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!
+      </div>
+      <div class="faq-chips" id="faq-box"></div>
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chat-input" placeholder="Сұрақ жазыңыз..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">➔</button>
+    </div>
+  </div>
+
+  <script>
+    // ПЕРЕВОДЫ МУЛЬТИЯЗЫЧНОСТИ
+    const translations = {
+      kk: {
+        profileBtn: "Жеке кабинет",
+        supportBtn: "AI Қолдау",
+        heroTitle: "01 / ЖҮРГІЗУШІНІ БАҚЫЛАУ АЙМАҒЫ",
+        sensorTitle: "AI КӨЗДІ БАҚЫЛАУ ДАТЧИГІ",
+        statusSafe: "СЕРГЕК / ҚАУІПСІЗ",
+        statusDanger: "ҚАУІП! ҰЙҚЫШЫЛДЫҚ",
+        safetyTitle: "ҚАУІПСІЗДІК ИНДЕКСІ",
+        riskLow: "Қауіп деңгейі: ТӨМЕН",
+        riskHigh: "Қауіп деңгейі: ЖОҒАРЫ",
+        timerLbl: "Көзді жұму ұзақтығы",
+        buzzerLbl: "Дыбыстық дабыл (Buzzer)",
+        speedLbl: "Жылдамдық / GPS",
+        blinkLbl: "Жыпылықтау жиілігі",
+        secUnit: " сек",
+        chartTitle: "02 / ҰЙҚЫШЫЛДЫҚ ДЕҢГЕЙІНІҢ ДИАГРАММАСЫ (LIVE GRAF)",
+        chartStatus: "Белсенді",
+        carPrefix: "Автомобиль: ",
+        modalTitle: "ЖЕКЕ КАБИНЕТ / ТІРКЕЛУ",
+        inputDriver: "Жүргізушінің аты-жөні",
+        inputType: "Көлік түрі (Тип транспорта)",
+        inputModel: "Автомобиль маркасы мен моделі",
+        inputNum: "Көліктің мемлекеттік нөмірі",
+        btnSave: "САҚТАУ",
+        alertBuzzer: "ДАБЫЛ!",
+        chatTitle: "🤖 СЕРГЕК AI ҚОЛДАУ",
+        chatWelcome: "Сәлеметсіз бе! Мен СЕРГЕК ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!",
+        chatPlaceholder: "Сұрақ жазыңыз...",
+        faqs: [
+          "Көзілдірік қалай қосылады?",
+          "Дыбыс неге шықпай жатыр?",
+          "Көлік дерегін қалай ауыстырамын?"
+        ]
+      },
+      ru: {
+        profileBtn: "Личный кабинет",
+        supportBtn: "AI Поддержка",
+        heroTitle: "01 / ЗОНА МОНИТОРИНГА ВОДИТЕЛЯ",
+        sensorTitle: "AI ДАТЧИК ОТСЛЕЖИВАНИЯ ГЛАЗ",
+        statusSafe: "СЕРГЕК / БЕЗОПАСНО",
+        statusDanger: "ОПАСНОСТЬ! СОНЛИВОСТЬ",
+        safetyTitle: "ИНДЕКС БЕЗОПАСНОСТИ",
+        riskLow: "Уровень риска: НИЗКИЙ",
+        riskHigh: "Уровень риска: ВЫСОКИЙ",
+        timerLbl: "Время закрытия глаз",
+        buzzerLbl: "Звуковой сигнал (Buzzer)",
+        speedLbl: "Скорость / GPS",
+        blinkLbl: "Частота моргания",
+        secUnit: " сек",
+        chartTitle: "02 / ДИАГРАММА УРОВНЯ СОНЛИВОСТИ (LIVE GRAPH)",
+        chartStatus: "Активно",
+        carPrefix: "Автомобиль: ",
+        modalTitle: "ЛИЧНЫЙ КАБИНЕТ / РЕГИСТРАЦИЯ",
+        inputDriver: "ФИО Водителя",
+        inputType: "Тип автотранспорта",
+        inputModel: "Марка и модель авто",
+        inputNum: "Гос. номер автомобиля",
+        btnSave: "СОХРАНИТЬ",
+        alertBuzzer: "ТРЕВОГА!",
+        chatTitle: "🤖 СЕРГЕК AI ПОДДЕРЖКА",
+        chatWelcome: "Здравствуйте! Я ИИ-ассистент СЕРГЕК. Задайте любой вопрос по работе очков или дашборда!",
+        chatPlaceholder: "Задайте вопрос...",
+        faqs: [
+          "Как подключить очки?",
+          "Почему не работает зуммер?",
+          "Как изменить данные авто?"
+        ]
+      },
+      en: {
+        profileBtn: "Personal Account",
+        supportBtn: "AI Support",
+        heroTitle: "01 / DRIVER MONITORING ZONE",
+        sensorTitle: "AI EYE TRACKING SENSOR",
+        statusSafe: "SERGEK / SAFE",
+        statusDanger: "DANGER! DROWSINESS",
+        safetyTitle: "SAFETY INDEX",
+        riskLow: "Risk level: LOW",
+        riskHigh: "Risk level: HIGH",
+        timerLbl: "Eye Closure Duration",
+        buzzerLbl: "Audio Alert (Buzzer)",
+        speedLbl: "Speed / GPS",
+        blinkLbl: "Blink Rate",
+        secUnit: " sec",
+        chartTitle: "02 / DROWSINESS LEVEL CHART (LIVE GRAPH)",
+        chartStatus: "Active",
+        carPrefix: "Vehicle: ",
+        modalTitle: "PERSONAL ACCOUNT / REGISTRATION",
+        inputDriver: "Driver Name",
+        inputType: "Vehicle Type",
+        inputModel: "Vehicle Model",
+        inputNum: "License Plate Number",
+        btnSave: "SAVE",
+        alertBuzzer: "ALERT!",
+        chatTitle: "🤖 SERGEK AI SUPPORT",
+        chatWelcome: "Hello! I am SERGEK AI Assistant. Ask any question about smart glasses or dashboard!",
+        chatPlaceholder: "Type a question...",
+        faqs: [
+          "How to connect glasses?",
+          "Why is buzzer silent?",
+          "How to change vehicle info?"
+        ]
+      }
+    };
+
+    let currentLang = localStorage.getItem('app_lang') || 'kk';
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('app_lang', lang);
+      document.getElementById('lang-select').value = lang;
+
+      const t = translations[lang];
+      document.getElementById('btn-profile-txt').innerText = t.profileBtn;
+      document.getElementById('lbl-support-btn').innerText = t.supportBtn;
+      document.getElementById('lbl-hero-title').innerText = t.heroTitle;
+      document.getElementById('lbl-sensor-title').innerText = t.sensorTitle;
+      document.getElementById('lbl-safety-title').innerText = t.safetyTitle;
+      document.getElementById('lbl-timer').innerText = t.timerLbl;
+      document.getElementById('lbl-buzzer').innerText = t.buzzerLbl;
+      document.getElementById('lbl-speed').innerText = t.speedLbl;
+      document.getElementById('lbl-blink').innerText = t.blinkLbl;
+      document.getElementById('lbl-chart-title').innerText = t.chartTitle;
+      document.getElementById('lbl-chart-status').innerText = t.chartStatus;
+
+      document.getElementById('lbl-modal-title').innerText = t.modalTitle;
+      document.getElementById('lbl-input-driver').innerText = t.inputDriver;
+      document.getElementById('lbl-input-type').innerText = t.inputType;
+      document.getElementById('lbl-input-model').innerText = t.inputModel;
+      document.getElementById('lbl-input-num').innerText = t.inputNum;
+      document.getElementById('lbl-btn-save').innerText = t.btnSave;
+
+      document.getElementById('lbl-chat-title').innerText = t.chatTitle;
+      document.getElementById('lbl-ai-welcome').innerText = t.chatWelcome;
+      document.getElementById('chat-input').placeholder = t.chatPlaceholder;
+
+      const faqBox = document.getElementById('faq-box');
+      faqBox.innerHTML = '';
+      t.faqs.forEach(q => {
+        const btn = document.createElement('div');
+        btn.className = 'chip';
+        btn.innerText = q;
+        btn.onclick = () => askFaq(q);
+        faqBox.appendChild(btn);
+      });
+
+      updateProfileUI();
+    }
+
+    // SOS Функция
+    function triggerSOS() {
+      alert("🚨 SOS СИГНАЛ ЖІБЕРІЛДІ! Диспетчерге шұғыл хабарлама жеткізілді.");
+    }
+
+    // Личный кабинет
+    function openModal() { document.getElementById('profile-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('profile-modal').style.display = 'none'; }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      localStorage.setItem('driver_name', document.getElementById('input-driver').value);
+      localStorage.setItem('car_type', document.getElementById('input-type').value);
+      localStorage.setItem('car_model', document.getElementById('input-model').value);
+      localStorage.setItem('car_num', document.getElementById('input-num').value);
+
+      updateProfileUI();
+      closeModal();
+    }
+
+    function updateProfileUI() {
+      const t = translations[currentLang];
+      const driver = localStorage.getItem('driver_name') || 'Тамерлан / Ералы';
+      const type = localStorage.getItem('car_type') || 'Седан';
+      const model = localStorage.getItem('car_model') || 'Toyota Camry';
+      const num = localStorage.getItem('car_num') || '011 AAA 03';
+
+      document.getElementById('disp-driver-name').innerText = driver;
+      document.getElementById('disp-car-model').innerText = `${t.carPrefix} ${model} (${type})`;
+      document.getElementById('disp-car-num').innerText = num;
+      document.getElementById('avatar-char').innerText = driver.charAt(0).toUpperCase();
+
+      document.getElementById('input-driver').value = driver;
+      document.getElementById('input-type').value = type;
+      document.getElementById('input-model').value = model;
+      document.getElementById('input-num').value = num;
+    }
+
+    // Темы
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+    }
+
+    // ИИ-Чат Логика
+    function toggleChat() {
+      const win = document.getElementById('chat-window');
+      win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    function askFaq(text) {
+      document.getElementById('chat-input').value = text;
+      sendMessage();
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const body = document.getElementById('chat-body');
+      
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.innerText = text;
+      body.appendChild(userMsg);
+      input.value = '';
+
+      body.scrollTop = body.scrollHeight;
+
+      setTimeout(() => {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'msg ai';
+        aiMsg.innerText = getAiResponse(text);
+        body.appendChild(aiMsg);
+        body.scrollTop = body.scrollHeight;
+      }, 600);
+    }
+
+    function getAiResponse(q) {
+      const query = q.toLowerCase();
+      if (currentLang === 'ru') {
+        if (query.includes('подключ') || query.includes('очк')) return "Для подключения очков включите Wi-Fi на плату XIAO ESP32-S3 и перейдите по локальному IP адресу или откройте WebSocket соединение.";
+        if (query.includes('зуммер') || query.includes('звук')) return "Зуммер срабатывает автоматически при удержании глаз закрытыми более 3 секунд (уровень шума 85 dB).";
+        if (query.includes('данны') || query.includes('измен') || query.includes('машин')) return "Вы можете изменить тип авто и гос. номер вверху сайта, нажав на кнопку 'Личный кабинет'.";
+        return "Я ИИ-помощник СЕРГЕК. Система работает штатно! Если у вас вопрос по датчикам ESP32-S3 — я с радостью отвечу.";
+      } else if (currentLang === 'en') {
+        if (query.includes('connect') || query.includes('glass')) return "Power on the XIAO ESP32-S3 board to stream WebSocket data directly to this dashboard.";
+        if (query.includes('buzzer') || query.includes('sound')) return "The buzzer automatically activates when eye-closure exceeds 3 seconds (85 dB alarm).";
+        if (query.includes('car') || query.includes('change')) return "You can update vehicle parameters and license plate by clicking 'Personal Account' in header.";
+        return "I am SERGEK AI Support. All safety sensors are nominal. Feel free to ask technical questions!";
+      } else {
+        if (query.includes('қосу') || query.includes('көзілдірік')) return "Көзілдірікті қосу үшін XIAO ESP32-S3 платасын токқа қосып, WebSocket желісіне жалғаныңыз.";
+        if (query.includes('дыбыс') || query.includes('дабыл')) return "Көз 3 секундтан артық жұмылса, 85 dB қаттылықтағы дабыл автоматты түрде іске қосылады.";
+        if (query.includes('көлік') || query.includes('дерек')) return "Көлік түрі мен нөмірін жоғарғы 'Жеке кабинет' батырмасы арқылы өзгерте аласыз.";
+        return "Мен СЕРГЕК ИИ-көмекшісімін. Жүйе қауіпсіз жұмыс істеп тұр! Сұрағыңыз болса, қоя беріңіз.";
+      }
+    }
+
+    // Старт
+    changeLanguage(currentLang);
+
+    // WebSocket
+    let socket = new WebSocket("ws://" + window.location.hostname + "/ws");
+
+    socket.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      const t = translations[currentLang];
+      
+      const heroCard = document.getElementById('hero-card');
+      const statusText = document.getElementById('status-text');
+      const timerText = document.getElementById('timer');
+      const faceIcon = document.getElementById('face-icon');
+      const scoreVal = document.getElementById('score-val');
+      const buzzerVal = document.getElementById('buzzer-val');
+      const ringBar = document.getElementById('ring-bar');
+      const riskLevel = document.getElementById('lbl-risk-level');
+
+      timerText.innerText = data.duration.toFixed(1) + t.secUnit;
+
+      if (data.status === "DROWSY" || data.duration >= 3.0) {
+        heroCard.className = 'glass-panel hero-card alert';
+        statusText.innerText = t.statusDanger;
+        scoreVal.innerText = '20%';
+        buzzerVal.innerText = t.alertBuzzer;
+        buzzerVal.style.color = 'var(--accent-danger)';
+        riskLevel.innerText = t.riskHigh;
+
+        ringBar.style.stroke = 'var(--accent-danger)';
+        ringBar.style.strokeDashoffset = '260';
+
+        faceIcon.innerHTML = `
+          <svg width="70" height="70" viewBox="0 0 24 24" fill="var(--accent-danger)" stroke="var(--accent-danger)" stroke-width="1.8">
+            <path d="M2 10h20"/>
+            <path d="M3 10l1 7a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H4"/>
+            <path d="M21 10l-1 7a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h4"/>
+          </svg>
+        `;
+      } else {
+        heroCard.className = 'glass-panel hero-card';
+        statusText.innerText = t.statusSafe;
+        scoreVal.innerText = '96%';
+        buzzerVal.innerText = '85 dB';
+        buzzerVal.style.color = 'var(--text-main)';
+        riskLevel.innerText = t.riskLow;
+
+        ringBar.style.stroke = 'var(--accent-safe)';
+        ringBar.style.strokeDashoffset = '13';
+
+        faceIcon.innerHTML = `
+          <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 10h20"/>
+            <path d="M3 10l1 7a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H4"/>
+            <path d="M21 10l-1 7a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h4"/>
+          </svg>
+        `;
+      }
+    };
+  </script>
+</body>
+</html>
