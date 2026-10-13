@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="kk">
+<html lang="kk" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -138,6 +138,7 @@
       padding: 6px 14px;
       border-radius: 20px;
       border: 1px solid var(--glass-border);
+      cursor: pointer;
     }
 
     .dot {
@@ -631,7 +632,7 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-safe);">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
-        <span class="logo-title">СЕРГЕК / TELEMETRY</span>
+        <span class="logo-title">Sentra / TELEMETRY</span>
       </div>
 
       <div class="header-actions">
@@ -658,7 +659,7 @@
           <span id="btn-profile-txt">Жеке кабинет</span>
         </button>
 
-        <div class="connection-status">
+        <div class="connection-status" title="Модератор нөмірі: +7 777 777 7777">
           <div class="dot" id="status-dot"></div>
           <span id="conn-text">XIAO ESP32-S3 Online</span>
         </div>
@@ -694,7 +695,7 @@
           <div style="font-size: 11px; color: var(--ash-gray); letter-spacing: 1px;" id="lbl-sensor-title">AI КӨЗДІ БАҚЫЛАУ ДАТЧИГІ</div>
         </div>
 
-        <div class="status-headline" id="status-text">СЕРГЕК / ҚАУІПСІЗ</div>
+        <div class="status-headline" id="status-text">Sentra / ҚАУІПСІЗ</div>
       </div>
 
       <!-- Safety Index Ring Widget -->
@@ -849,12 +850,12 @@
   <!-- Chat Window -->
   <div class="chat-window" id="chat-window">
     <div class="chat-header">
-      <span id="lbl-chat-title">🤖 СЕРГЕК AI ҚОЛДАУ</span>
+      <span id="lbl-chat-title">🤖 Sentra AI ҚОЛДАУ</span>
       <button class="close-btn" onclick="toggleChat()">&times;</button>
     </div>
     <div class="chat-body" id="chat-body">
       <div class="msg ai" id="lbl-ai-welcome">
-        Сәлеметсіз бе! Мен СЕРГЕК ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!
+        Сәлеметсіз бе! Мен Sentra ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!
       </div>
       <div class="faq-chips" id="faq-box"></div>
     </div>
@@ -872,7 +873,7 @@
         supportBtn: "AI Қолдау",
         heroTitle: "01 / ЖҮРГІЗУШІНІ БАҚЫЛАУ АЙМАҒЫ",
         sensorTitle: "AI КӨЗДІ БАҚЫЛАУ ДАТЧИГІ",
-        statusSafe: "СЕРГЕК / ҚАУІПСІЗ",
+        statusSafe: "Sentra / ҚАУІПСІЗ",
         statusDanger: "ҚАУІП! ҰЙҚЫШЫЛДЫҚ",
         safetyTitle: "ҚАУІПСІЗДІК ИНДЕКСІ",
         riskLow: "Қауіп деңгейі: ТӨМЕН",
@@ -892,8 +893,8 @@
         inputNum: "Көліктің мемлекеттік нөмірі",
         btnSave: "САҚТАУ",
         alertBuzzer: "ДАБЫЛ!",
-        chatTitle: "🤖 СЕРГЕК AI ҚОЛДАУ",
-        chatWelcome: "Сәлеметсіз бе! Мен СЕРГЕК ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!",
+        chatTitle: "🤖 Sentra AI ҚОЛДАУ",
+        chatWelcome: "Сәлеметсіз бе! Мен Sentra ИИ-көмекшісімін. Көзілдірік немесе жүйе бойынша сұрағыңызды қойыңыз!",
         chatPlaceholder: "Сұрақ жазыңыз...",
         faqs: [
           "Көзілдірік қалай қосылады?",
@@ -906,7 +907,7 @@
         supportBtn: "AI Поддержка",
         heroTitle: "01 / ЗОНА МОНИТОРИНГА ВОДИТЕЛЯ",
         sensorTitle: "AI ДАТЧИК ОТСЛЕЖИВАНИЯ ГЛАЗ",
-        statusSafe: "СЕРГЕК / БЕЗОПАСНО",
+        statusSafe: "Sentra / БЕЗОПАСНО",
         statusDanger: "ОПАСНОСТЬ! СОНЛИВОСТЬ",
         safetyTitle: "ИНДЕКС БЕЗОПАСНОСТИ",
         riskLow: "Уровень риска: НИЗКИЙ",
@@ -926,8 +927,8 @@
         inputNum: "Гос. номер автомобиля",
         btnSave: "СОХРАНИТЬ",
         alertBuzzer: "ТРЕВОГА!",
-        chatTitle: "🤖 СЕРГЕК AI ПОДДЕРЖКА",
-        chatWelcome: "Здравствуйте! Я ИИ-ассистент СЕРГЕК. Задайте любой вопрос по работе очков или дашборда!",
+        chatTitle: "🤖 Sentra AI ПОДДЕРЖКА",
+        chatWelcome: "Здравствуйте! Я ИИ-ассистент Sentra. Задайте любой вопрос по работе очков или дашборда!",
         chatPlaceholder: "Задайте вопрос...",
         faqs: [
           "Как подключить очки?",
@@ -940,7 +941,7 @@
         supportBtn: "AI Support",
         heroTitle: "01 / DRIVER MONITORING ZONE",
         sensorTitle: "AI EYE TRACKING SENSOR",
-        statusSafe: "SERGEK / SAFE",
+        statusSafe: "Sentra / SAFE",
         statusDanger: "DANGER! DROWSINESS",
         safetyTitle: "SAFETY INDEX",
         riskLow: "Risk level: LOW",
@@ -960,8 +961,8 @@
         inputNum: "License Plate Number",
         btnSave: "SAVE",
         alertBuzzer: "ALERT!",
-        chatTitle: "🤖 SERGEK AI SUPPORT",
-        chatWelcome: "Hello! I am SERGEK AI Assistant. Ask any question about smart glasses or dashboard!",
+        chatTitle: "🤖 Sentra AI SUPPORT",
+        chatWelcome: "Hello! I am Sentra AI Assistant. Ask any question about smart glasses or dashboard!",
         chatPlaceholder: "Type a question...",
         faqs: [
           "How to connect glasses?",
@@ -1105,22 +1106,23 @@
         if (query.includes('подключ') || query.includes('очк')) return "Для подключения очков включите Wi-Fi на плату XIAO ESP32-S3 и перейдите по локальному IP адресу или откройте WebSocket соединение.";
         if (query.includes('зуммер') || query.includes('звук')) return "Зуммер срабатывает автоматически при удержании глаз закрытыми более 3 секунд (уровень шума 85 dB).";
         if (query.includes('данны') || query.includes('измен') || query.includes('машин')) return "Вы можете изменить тип авто и гос. номер вверху сайта, нажав на кнопку 'Личный кабинет'.";
-        return "Я ИИ-помощник СЕРГЕК. Система работает штатно! Если у вас вопрос по датчикам ESP32-S3 — я с радостью отвечу.";
+        return "Я ИИ-помощник Sentra. Система работает штатно! Если у вас вопрос по датчикам ESP32-S3 — я с радостью отвечу.";
       } else if (currentLang === 'en') {
         if (query.includes('connect') || query.includes('glass')) return "Power on the XIAO ESP32-S3 board to stream WebSocket data directly to this dashboard.";
         if (query.includes('buzzer') || query.includes('sound')) return "The buzzer automatically activates when eye-closure exceeds 3 seconds (85 dB alarm).";
         if (query.includes('car') || query.includes('change')) return "You can update vehicle parameters and license plate by clicking 'Personal Account' in header.";
-        return "I am SERGEK AI Support. All safety sensors are nominal. Feel free to ask technical questions!";
+        return "I am Sentra AI Support. All safety sensors are nominal. Feel free to ask technical questions!";
       } else {
         if (query.includes('қосу') || query.includes('көзілдірік')) return "Көзілдірікті қосу үшін XIAO ESP32-S3 платасын токқа қосып, WebSocket желісіне жалғаныңыз.";
         if (query.includes('дыбыс') || query.includes('дабыл')) return "Көз 3 секундтан артық жұмылса, 85 dB қаттылықтағы дабыл автоматты түрде іске қосылады.";
         if (query.includes('көлік') || query.includes('дерек')) return "Көлік түрі мен нөмірін жоғарғы 'Жеке кабинет' батырмасы арқылы өзгерте аласыз.";
-        return "Мен СЕРГЕК ИИ-көмекшісімін. Жүйе қауіпсіз жұмыс істеп тұр! Сұрағыңыз болса, қоя беріңіз.";
+        return "Мен Sentra ИИ-көмекшісімін. Жүйе қауіпсіз жұмыс істеп тұр! Сұрағыңыз болса, қоя беріңіз.";
       }
     }
 
     // Старт
     changeLanguage(currentLang);
+    updateProfileUI();
 
     // WebSocket
     let socket = new WebSocket("ws://" + window.location.hostname + "/ws");
